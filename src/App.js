@@ -1,11 +1,14 @@
 import React from "react";
 import { gql, useQuery } from "@apollo/client";
+import { data as schemaData } from './graphql/schema';
 
-const ALL_PEOPLE = gql`
-  query AllPeople {
-    people {
+const ALL_ITEMS = gql`
+  query Items {
+    items {
       id
-      name
+      query {
+        id
+      }
     }
   }
 `;
@@ -13,8 +16,9 @@ const ALL_PEOPLE = gql`
 export default function App() {
   const {
     loading,
+    error,
     data
-  } = useQuery(ALL_PEOPLE);
+  } = useQuery(ALL_ITEMS);
 
   return (
     <main>
@@ -22,15 +26,27 @@ export default function App() {
       <p>
         This application can be used to demonstrate an error in Apollo Client.
       </p>
-      <h2>Names</h2>
+      <h2>Incorrect query results</h2>
+      <p>
+        If the <code>__typename</code> <code>Query</code> is used, caching will
+        fail to look up the correct values. For the query
+        <pre>
+          {ALL_ITEMS.loc.source.body}
+        </pre>
+        the data returned for the graphql operation is
+        <pre>
+          {JSON.stringify(schemaData, null, 2)}
+        </pre>
+        but the <code>data</code> from <code>useQuery</code> is:
+      </p>
       {loading ? (
         <p>Loading…</p>
+      ) : error ?(
+        <p>Error: {String(error)}</p>
       ) : (
-        <ul>
-          {data.people.map(person => (
-            <li key={person.id}>{person.name}</li>
-          ))}
-        </ul>
+        <pre>
+          {JSON.stringify(data, null, 2)}
+        </pre>
       )}
     </main>
   );

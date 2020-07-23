@@ -2,32 +2,39 @@ import {
   GraphQLSchema,
   GraphQLObjectType,
   GraphQLID,
-  GraphQLString,
   GraphQLList,
 } from 'graphql';
-
-const PersonType = new GraphQLObjectType({
-  name: 'Person',
-  fields: {
-    id: { type: GraphQLID },
-    name: { type: GraphQLString },
-  },
-});
-
-const peopleData = [
-  { id: 1, name: 'John Smith' },
-  { id: 2, name: 'Sara Smith' },
-  { id: 3, name: 'Budd Deey' },
-];
 
 const QueryType = new GraphQLObjectType({
   name: 'Query',
   fields: {
-    people: {
-      type: new GraphQLList(PersonType),
-      resolve: () => peopleData,
+    id: { type: GraphQLID },
+  },
+});
+
+const ItemType = new GraphQLObjectType({
+  name: 'Item',
+  fields: {
+    id: { type: GraphQLID },
+    query: { type: QueryType }
+  },
+});
+
+export const data = Array(3).fill(undefined).map((_, i) => ({
+  id: i,
+  query: {
+    id: i
+  }
+}));
+
+const RootQueryType = new GraphQLObjectType({
+  name: 'RootQuery',
+  fields: {
+    items: {
+	    type: new GraphQLList(ItemType),
+	    resolve: () => data,
     },
   },
 });
 
-export const schema = new GraphQLSchema({ query: QueryType });
+export const schema = new GraphQLSchema({ query: RootQueryType });

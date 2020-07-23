@@ -8,7 +8,13 @@ import App from "./App";
 import "./index.css";
 
 const client = new ApolloClient({
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      RootQuery: {
+        queryType: true,
+      },
+    }
+  }),
   link
 });
 
